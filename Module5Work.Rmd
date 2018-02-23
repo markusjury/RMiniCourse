@@ -1,0 +1,34 @@
+---
+title: "Module5Exercise"
+author: "Markus Jury"
+date: "February 23, 2018"
+output: html_document
+---
+##libraries
+```{r,results='hide',message=FALSE}
+library(tidyverse)
+library(Ecdat)
+library(rio)
+```
+
+##import data (as tibbles)
+```{r}
+wdi_data <- import("wdi_data.rds") %>% as.tibble()
+```
+
+```{r}
+affairs <- Fair %>% as.tibble()
+```
+
+##Selecting variables
+```{r}
+affairs %>% select("nbaffairs","ym","child","rate","age")
+```
+
+##renaming variables
+```{r}
+affairs <- affairs %>%
+  rename(affairs = nbaffairs,
+         yrsmarr = ym,
+         mrating = rate)
+```
