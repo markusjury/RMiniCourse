@@ -32,3 +32,98 @@ affairs <- affairs %>%
          yrsmarr = ym,
          mrating = rate)
 ```
+
+##converting mrating
+```{r}
+affairs$mrating <- as.factor(affairs$mrating)
+str(affairs)
+```
+
+##affairs regression
+```{r}
+affairsreg <- lm(affairs ~ age + child + yrsmarr + I(yrsmarr^2), data=affairs)
+summary(affairsreg)
+```
+
+##model diagnostics
+```{r,results='hide',message=FALSE}
+library(lmtest)
+```
+
+```{r}
+bptest(affairsreg)
+resettest(affairsreg)
+```
+Our result from the Breusch-Pagan test is highly significant.
+We therefore reject the H0 of homoscedastic errors.
+
+Our result from the RESET test is not significant at any level.
+We therefore fail to reject the H0 that our model has the correct functional
+form given our chosen variables.
+
+##Create Ye Olde Barre Plotte
+```{r,results='hide',message=FALSE}
+library(ggthemes)
+```
+
+```{r}
+affairssum <- affairs %>% group_by(mrating) %>% 
+  summarize(avgaffairs = mean(affairs))
+ggplot(affairssum, aes(x=mrating, y=avgaffairs)) + geom_bar(stat="identity") + 
+ggtitle("Affairs by Marital Rating") + xlab("Marital Rating") + 
+ylab("Average # of Affairs") + theme_stata()
+```
+
+Moving on to wdi_data
+
+##Scatterplots
+```{r}
+ggplot(wdi_data, aes(x=secondary.complet.avg, y=femaletomale.avg, col= 
+                       GDP.avg)) + 
+geom_point() + ggtitle("Secondary School Completion by Employment Sex Ratio") + 
+xlab("Secondary School Completion Ratio") + ylab("Female-to-Male Employment") +
+scale_color_gradient(low="red2",high="green", name="Average GDP")
+```
+
+```{r}
+ggplot(wdi_data, aes(x=secondary.complet.avg, y=unemp.basic.educ., col= 
+                       GDP.avg)) + 
+geom_point() + 
+ggtitle("Secondary School Completion by Unemployment 
+        For Those With Basic Education") + 
+xlab("Secondary School Completion Ratio") +
+ylab("Unemployment For Those With Basic Education") +
+scale_color_gradient(low="red2",high="green", name="Average GDP")
+```
+
+##Pooled Regression
+```{r,results='hide',message=FALSE}
+library(broom)
+```
+
+```{r}
+schoolreg <- lm(GDP.avg ~ secondary.complet.avg, data=wdi_data)
+tidy(schoolreg)
+```
+
+##Test for Autocorrelation
+```{r}
+bgtest(schoolreg)
+```
+
+##Fixed Effects
+```{r,results='hide',message=FALSE}
+library(plm)
+```
+
+```{r}
+schoolregfix <- plm(GDP.avg ~ secondary.complet.avg, data=wdi_data, 
+                    index=c("country", "year"), model="within", effect="twoway")
+tidy(schoolregfix)
+```
+
+##Autocorrelation Robust Interference
+
+```{r}
+tidy(coeftest(schoolregfix, vcov = vcovHC(schoolregfix, type="HC1")))
+```
