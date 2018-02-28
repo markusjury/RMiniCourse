@@ -95,9 +95,38 @@ surveyresults$guest_first_name <- tolower(surveyresults$guest_first_name)
 maindata <- left_join(maindata, surveyresults, by="guest_first_name")
 ```
 
+##Changing Survey Variable
 
+```{r}
+maindata$guest_race_continuous <- (maindata$guest_race_continuous) - 1
+```
 
+##Creating Indicator Variables
 
+```{r}
+maindata <- maindata %>% mutate(host_race_black = ifelse(host_race=="black",1,0))
+```
+
+```{r}
+maindata <- maindata %>% mutate(host_race_white = ifelse(host_race=="white",1,0))
+```
+
+```{r}
+maindata <- maindata %>% mutate(host_male = ifelse(host_gender=="male",1,0))
+```
+
+##Categorical Host Age Variable
+
+```{r}
+maindata <- maindata %>% mutate(host_age_cat = case_when(
+  host_age %in% c("young","young/uu","uu/young","young/na","na/young") ~ "0",
+  host_age %in% c("middle/young","young/middle") ~ "1",
+  host_age %in% c("middle","middle/uu","uu/middle","middle/na",
+                 "na/middle") ~ "2",
+  host_age %in% c("middle/old","old/middle") ~ "3",
+  host_age %in% c("old/middle","old","old/uu","uu/old","old/na","na/old") ~ "4"
+))
+```
 
 
 
