@@ -56,7 +56,16 @@ datanames <- as.matrix(datanames)
 colnames(maindata) <- datanames
 ```
 
+##Reclassifying Columns
 
+```{r}
+for (i in c(3:6,10:14,19:21,39:46,49)){
+  maindata[[i]] <- as.numeric(maindata[[i]])
+}
+for (i in c(1,7:9,15:17,23:33,36:38,47)){
+  maindata[[i]] <- as.factor(maindata[[i]])
+}
+```
 
 
 
