@@ -10,7 +10,8 @@ output:
     df_print: tibble
 
 ---
-##Loading Libraries
+
+## Loading Initial Libraries
 ```{r,results='hide'}
 library("tidyverse")
 library("rio")
@@ -18,13 +19,13 @@ library("rio")
 ```
 
 
-##Importing Data
+## Importing Data
 
 ```{r}
 maindata <- import("./20160213_data/main_data.csv", header=FALSE)
 ```
 
-##Recoding Missing Values
+## Recoding Missing Values
 
 ```{r}
 maindata <- maindata %>% map(tolower)
@@ -46,7 +47,7 @@ maindata <- map(maindata,na_if,"-1") %>% as.tibble
 datanames <- import("datanames.csv")
 ```
 
-##Renaming Column Names
+## Renaming Column Names
 
 ```{r}
 datanames <- as.matrix(datanames)
@@ -56,7 +57,7 @@ datanames <- as.matrix(datanames)
 colnames(maindata) <- datanames
 ```
 
-##Reclassifying Columns
+## Reclassifying Columns
 
 ```{r}
 for (i in c(3:6,10:14,19:21,39:46,49)){
@@ -67,21 +68,21 @@ for (i in c(1,7:9,15:17,23:33,36:38,47)){
 }
 ```
 
-##Releveling Refgroups
+## Releveling Refgroups
 
 ```{r}
 maindata$guest_race <- maindata$guest_race %>% relevel(ref="white")
 maindata$guest_gender <- maindata$guest_gender %>% relevel(ref="male")
 ```
 
-##Creating namebycity
+## Creating namebycity
 
 ```{r}
 maindata <- maindata %>% mutate(namebycity = paste(guest_first_name,city))
 maindata
 ```
 
-##Import + Merge Survey Results
+## Import + Merge Survey Results
 
 ```{r}
 surveyresults <- import("./20160213_data/name_survey_results.xlsx")
@@ -95,13 +96,13 @@ surveyresults$guest_first_name <- tolower(surveyresults$guest_first_name)
 maindata <- left_join(maindata, surveyresults, by="guest_first_name")
 ```
 
-##Changing Survey Variable
+## Changing Survey Variable
 
 ```{r}
 maindata$guest_race_continuous <- (maindata$guest_race_continuous) - 1
 ```
 
-##Creating Indicator Variables
+## Creating Indicator Variables
 
 ```{r}
 maindata <- maindata %>% mutate(host_race_black = ifelse(host_race=="black",1,0))
@@ -114,8 +115,8 @@ maindata <- maindata %>% mutate(host_race_white = ifelse(host_race=="white",1,0)
 ```{r}
 maindata <- maindata %>% mutate(host_male = ifelse(host_gender=="male",1,0))
 ```
-
-##Categorical Host Age Variable
+ 
+## Categorical Host Age Variable
 
 ```{r}
 maindata <- maindata %>% mutate(host_age_cat = case_when(
@@ -128,6 +129,24 @@ maindata <- maindata %>% mutate(host_age_cat = case_when(
 ))
 ```
 
+## Binary variables for Host Characteristics
+
+```{r}
+maindata <- maindata %>% 
+  mutate(ten_reviews=ifelse(number_of_reviews>=10,1,0),
+        five_star_property=ifelse(apt_rating=5,1,0),
+        multiple_listings=ifelse(number_of_listing>1,1,0),
+        shared_property=ifelse(property_setup=="private room" | 
+                                 "shared room",1,0),
+        shared_bathroom=ifelse(bathrooms<1.5 & shared_property=1,1,0),
+        has_cleaning_fee=ifelse(cleaning_fee!=NA,1,0),
+        strict_cancellation=ifelse(cancellation_policy=="strict",1,0),
+        young=ifelse(host_age_cat=0,1,0),
+        middle=ifelse(host_age_cat=1|2,1,0),
+        old=ifelse(host_age_cat=3|4,1,0))
+```
+                            
+                                
 
 
 
