@@ -67,13 +67,33 @@ for (i in c(1,7:9,15:17,23:33,36:38,47)){
 }
 ```
 
+##Releveling Refgroups
 
+```{r}
+maindata$guest_race <- maindata$guest_race %>% relevel(ref="white")
+maindata$guest_gender <- maindata$guest_gender %>% relevel(ref="male")
+```
 
+##Creating namebycity
 
+```{r}
+maindata <- maindata %>% mutate(namebycity = paste(guest_first_name,city))
+maindata
+```
 
+##Import + Merge Survey Results
 
+```{r}
+surveyresults <- import("./20160213_data/name_survey_results.xlsx")
+```
 
+```{r}
+surveyresults$guest_first_name <- tolower(surveyresults$guest_first_name)
+```
 
+```{r}
+maindata <- left_join(maindata, surveyresults, by="guest_first_name")
+```
 
 
 
