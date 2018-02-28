@@ -1,0 +1,76 @@
+---
+title: "CapstoneExerciseFeb28"
+author: "Markus Jury"
+date: "February 28, 2018"
+output: 
+  html_document:
+    theme: flatly
+    toc: yes
+    highlight: haddock
+    df_print: tibble
+
+---
+##Loading Libraries
+```{r,results='hide'}
+library("tidyverse")
+library("rio")
+
+```
+
+
+##Importing Data
+
+```{r}
+maindata <- import("./20160213_data/main_data.csv", header=FALSE)
+```
+
+##Recoding Missing Values
+
+```{r}
+maindata <- maindata %>% map(tolower)
+```
+
+```{r}
+maindata <- map(maindata,na_if,"\\n")
+```
+
+```{r}
+maindata <- map(maindata,na_if,"null")
+```
+
+```{r}
+maindata <- map(maindata,na_if,"-1") %>% as.tibble
+```
+
+```{r}
+datanames <- import("datanames.csv")
+```
+
+##Renaming Column Names
+
+```{r}
+datanames <- as.matrix(datanames)
+```
+
+```{r}
+colnames(maindata) <- datanames
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
