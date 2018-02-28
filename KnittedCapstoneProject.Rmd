@@ -137,13 +137,13 @@ maindata <- maindata %>%
         five_star_property=ifelse(apt_rating==5,1,0),
         multiple_listings=ifelse(number_of_listings>1,1,0),
         shared_property=ifelse(property_setup %in% c("private room",
-                                                     "shared room",1,0),
+                                                     "shared room"),1,0),
         shared_bathroom=ifelse(bathrooms<1.5 & shared_property==1,1,0),
         has_cleaning_fee=ifelse(!is.na(cleaning_fee),1,0),
         strict_cancellation=ifelse(cancellation_policy=="strict",1,0),
         young=ifelse(host_age_cat==0,1,0),
         middle=ifelse(host_age_cat %in% c(1,2),1,0),
-        old=ifelse(host_age_cat %in% c(3,4),1,0))
+        old=ifelse(host_age_cat %in% c(3,4),1,0)
   )
 ```
                             
