@@ -135,7 +135,7 @@ maindata <- maindata %>% mutate(host_age_cat = case_when(
 maindata <- maindata %>% 
   mutate(ten_reviews=ifelse(number_of_reviews>=10,1,0),
         five_star_property=ifelse(apt_rating==5,1,0),
-        multiple_listings=ifelse(number_of_listing>1,1,0),
+        multiple_listings=ifelse(number_of_listings>1,1,0),
         shared_property=ifelse(property_setup %in% c("private room",
                                                      "shared room",1,0),
         shared_bathroom=ifelse(bathrooms<1.5 & shared_property==1,1,0),
