@@ -113,7 +113,7 @@ maindata <- maindata %>% mutate(host_race_white = ifelse(host_race=="white",1,0)
 ```
 
 ```{r}
-maindata <- maindata %>% mutate(host_male = ifelse(host_gender=="male",1,0))
+maindata <- maindata %>% mutate(host_male = ifelse(host_gender=="m",1,0))
 ```
  
 ## Categorical Host Age Variable
@@ -166,5 +166,85 @@ maindata <- maindata %>% mutate(yes = ifelse(host_response %in% c(1,4,6),1,0))
 ```
 
 ## Drop Atlanta and Tampa
+
+```{r}
+maindata <- maindata %>% filter(!(city=="tampa"|city=="atlanta"))
+```
+
+##Merging in data from past guests
+
+```{r}
+hostdata <- import("./20160213_data/hosts.dta")
+```
+
+```{r}
+hostdata$host_id <- tolower(hostdata$host_id)
+```
+
+```{r}
+maindata <- left_join(maindata, hostdata, by="host_id")
+```
+
+# Main Analysis
+
+##Install Regression Libraries
+
+```{r,results='hide'}
+library("broom")
+library("lmtest")
+library("multiwayvcov")
+```
+
+## Perform Table 2 Regressions
+
+```{r}
+T2R1 <- lm(yes ~ guest_race, data=maindata)
+```
+
+```{r}
+T2R2 <- lm(yes ~ guest_race + host_race_black + host_male, data=maindata)
+tidy(T2R2)
+```
+
+```{r}
+T2R3 <- lm(yes ~ guest_race + host_race_black + host_male + multiple_listings +
+             shared_property + ten_reviews + log(price), data=maindata)
+tidy(T2R3)
+```
+
+## Clustering Regressions
+
+```{r}
+cluster_R1 <- cluster.vcov(T2R1, cluster=maindata$namebycity)
+tidy(coeftest(T2R1, vcov=cluster_R1))
+```
+
+```{r}
+ClusterReg <- function(regobj){
+  clustered <- cluster.vcov(regobj, cluster=maindata$namebycity)
+  tidy(coeftest(regobj, vcov=clustered))
+}
+```
+
+```{r}
+Cluster_R2 <- ClusterReg(T2R2)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
