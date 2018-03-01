@@ -147,7 +147,15 @@ maindata <- maindata %>%
   )
 ```
                             
-                                
+```{r}
+maindata <- maindata %>% mutate(simplified_response = case_when(
+  is.na(host_response) ~ "no response",
+  host_response==1 ~ "yes",
+  host_response==0 ~ "no",
+  host_response %in% c(4:8) ~ "conditional yes",
+  host_response %in% c(2,3,9,10,11) ~ "conditional no"
+))
+```
 
 
 
